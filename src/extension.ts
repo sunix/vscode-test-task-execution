@@ -29,7 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
                 }
                 */
                 console.log(t);
-                vscode.tasks.executeTask(t);
+                vscode.tasks.executeTask(t); // KO the task is not revealed
                 break;
             }
         }
