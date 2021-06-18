@@ -10,15 +10,27 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:test-task-execution.helloWorld"
+        "onCommand:test-task-execution.execute-echo",
+        "onCommand:test-task-execution.execute-task-reveal-as-string",
+        "onCommand:test-task-execution.execute-task-reveal-as-enum"
+
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "test-task-execution.helloWorld",
-				"title": "Hello World"
+				"command": "test-task-execution.execute-echo",
+				"title": "vscode.tasks.executeTask the task named `echo`"
+            },
+            {
+				"command": "test-task-execution.execute-task-reveal-as-string",
+				"title": "vscode.tasks.executeTask with presentationOptions: { reveal: 'always' }"
+            },
+            {
+				"command": "test-task-execution.execute-task-reveal-as-enum",
+				"title": "vscode.tasks.executeTask with presentationOptions: { reveal: 1 }"
 			}
+
 		]
 	},
 	"scripts": {

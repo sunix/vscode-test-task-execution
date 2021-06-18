@@ -4,12 +4,17 @@ export function activate(context: vscode.ExtensionContext) {
 
     console.log('Congratulations, your extension "test-task-execution" is now active!');
 
-    let disposable = vscode.commands.registerCommand('test-task-execution.helloWorld', async () => {
+    let echoCommand = vscode.commands.registerCommand('test-task-execution.execute-echo', async () => {
 
+
+        vscode.window.showInformationMessage('Fetching existing tasks and executing the task named "echo"');
         var tasks = await vscode.tasks.fetchTasks();
         for (var t of tasks) {
             if (t.name === "echo") {
-                // This is the generated json for a task created with `Task: Configured tasks ...`
+
+                vscode.window.showInformationMessage('Running vscode.tasks.executeTask for the task `echo`. The task `echo` should be revealed');
+                vscode.tasks.executeTask(t); // KO the task is not revealed
+                console.log(t);
                 // reveal has the value 'always' and not 1
                 /*
                 {
@@ -28,28 +33,30 @@ export function activate(context: vscode.ExtensionContext) {
                   }
                 }
                 */
-                console.log(t);
-                vscode.tasks.executeTask(t); // KO the task is not revealed
-                break;
+
+                return;
             }
         }
-        
-        var message = 'Hello World from vscode-test-task-execution! This message should be displayed in a Task terminal.'
-        vscode.window.showInformationMessage(message);
+        vscode.window.showInformationMessage('No task named `echo` found. Please create one with the command `Task: Configured tasks ...` > `Configure new Task` > `Others`');
+    });
+    context.subscriptions.push(echoCommand);
 
+
+    let execTaskWithRevealAlwaysAsStringCommand = vscode.commands.registerCommand('test-task-execution.execute-task-reveal-as-string', async () => {
+        var message = "Executing task with 'presentationOptions: { reveal: 'always' }'.\nThe task should be revealed ... but is not ..."
+        vscode.window.showInformationMessage(message);
         var execution = new vscode.ShellExecution("echo \"" + message + "\"", {});
         var task:vscode.Task = {
-            name: "hello",
+            name: "presentationOptions: { reveal: 'always' }",
             scope: 1,
             source: 'task',
             definition: { type: 'shell' },
             execution: execution,
             presentationOptions: {
-                echo: true,
-                // Uncomment one of the following:
+                echo: false,
                 reveal: JSON.parse('"always"'), // KO the task is not revealed
-                // reveal: vscode.TaskRevealKind.Always, //OK the task is revealed
                 focus: false,
+                panel: vscode.TaskPanelKind.New,
             },
             isBackground: false,
             runOptions: {},
@@ -58,8 +65,33 @@ export function activate(context: vscode.ExtensionContext) {
         console.log(task);
         vscode.tasks.executeTask(task);
     });
+    context.subscriptions.push(execTaskWithRevealAlwaysAsStringCommand);
 
-    context.subscriptions.push(disposable);
+    let execTaskWithRevealAlwaysAsEnumCommand = vscode.commands.registerCommand('test-task-execution.execute-task-reveal-as-enum', async () => {
+        var message = "Executing task with 'presentationOptions: { reveal: 1 }'.\nThe task should be revealed."
+        vscode.window.showInformationMessage(message);
+        var execution = new vscode.ShellExecution("echo \"" + message + "\"", {});
+        var task:vscode.Task = {
+            name: "presentationOptions: { reveal: 1 }",
+            scope: 1,
+            source: 'task',
+            definition: { type: 'shell' },
+            execution: execution,
+            presentationOptions: {
+                echo: false,
+                reveal: vscode.TaskRevealKind.Always, //OK the task is revealed
+                focus: false,
+                panel: vscode.TaskPanelKind.New
+            },
+            isBackground: false,
+            runOptions: {},
+            problemMatchers: []
+        }
+        console.log(task);
+        vscode.tasks.executeTask(task);
+    });
+    context.subscriptions.push(execTaskWithRevealAlwaysAsStringCommand);
+
 }
 
 // this method is called when your extension is deactivated
